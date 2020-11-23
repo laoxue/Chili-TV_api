@@ -36,17 +36,25 @@ exports.plugin = {
                                 }
                                 // 签发token
                                 let token = jwt.sign(payload, process.env.SECRET_KEY,{
-                                    expiresIn: 1440
+                                    expiresIn: 14440
                                 })
-                                let {username , sex ,remark, headUrl} = user
+                                let { _id, username , sex ,remark, headUrl} = user
+                                const datas = {
+                                    username,
+                                    sex,
+                                    remark,
+                                    headUrl,
+                                    token
+                                }
+                                server.app.dbRedis.set(username,JSON.stringify(datas),function(err, reply){
+                                    if (err) {
+                                        console.log(err);  
+                                            return;  
+                                    }
+                                    console.log("set key redis " + reply.toString() + ", value is tencent");  
+                                })
                                 const backData = {
-                                    data: {
-                                        username,
-                                        sex,
-                                        remark,
-                                        headUrl,
-                                        token
-                                    },
+                                    data: datas,
                                     code: 0
                                 }
                                 return backData

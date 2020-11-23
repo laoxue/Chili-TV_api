@@ -5,6 +5,7 @@ const fs = require("fs"); // 引入读取
 const Vision = require('vision') // 引入接口
 const Ejs = require('ejs') // 引入模板
 const mongoose = require('mongoose')
+const redis = require("redis")
 // 创建接口服务器
 const server = new hapi.Server({
     host: '0.0.0.0',
@@ -41,6 +42,10 @@ server.app.db = mongoose.connect(mongoDBUrl,
         useNewUrlParser: true ,
         useUnifiedTopology:true}
 )
+// redis链接
+const redisDBUrl = redis.createClient(6379, '127.0.0.1')
+server.app.dbRedis = redisDBUrl
+
 mongoose.Promise = global.Promise;
 mongoose.connection.on("connected", () => {
     console.log("mongodb数据库连接成功")
