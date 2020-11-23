@@ -186,6 +186,30 @@ exports.plugin = {
                     })
                 }
             },
+            // 检查token有效性
+            {
+                method: 'get',
+                path: '/checktoken',
+                handler: async (request, h) => {
+                    try {
+                        const decoded = jwt.verify(
+                            request.headers.authorization,
+                            process.env.SECRET_KEY
+                        )
+                        next()
+                    } catch(err) {
+                        return h.redirect("login").code(200)
+                    }
+                    // const decoded = jwt.verify(
+                    //     request.headers.authorization,
+                    //     process.env.SECRET_KEY
+                    // )
+                    // 往schema中添加属性
+                    return {
+                        code:0 
+                    }
+                }
+            },
             // 上传头像
             {
                 method: 'POST',

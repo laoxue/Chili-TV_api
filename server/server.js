@@ -15,7 +15,13 @@ const server = new hapi.Server({
     },
     port: 3000
 })
-// const io = require("socket.io")(server.listener)
+const io = require("socket.io")(server.listener, {
+    cors: {
+      origin: '*',
+    }
+  });
+server.app.websocket = io
+// server.bind({websocket: io});
 // const routesCreate = require('./routes/createuser.route')
 require('./config/index.js')
 // var Schema = mongoose.Schema;
@@ -26,20 +32,6 @@ require('./config/index.js')
 // }, {collection: "user"});
 // var User = mongoose.model('User', UserModelSchema);
 // 创建应用
-// 聊天室
-// io.set('transports', ['websocket', 'xhr-polling', 'jsonp-polling', 'htmlfile', 'flashsocket']);
-// io.set('origins', '*:*')
-// io.on('connection',function(socket) {
-//     //接收数据
-//     socket.on('login', function (obj) {                
-//         console.log(obj.username);
-//         // 发送数据
-//         socket.emit('relogin', {
-//           msg: `你好${obj.username}`,
-//           code: 200
-//         });  
-//     });
-//   });
 // ----------------------------------------------- 分割线 --------------------------------------------------------------------
 
 // 链接本地数据库
@@ -100,6 +92,17 @@ const init = async () => {
             // 前缀
             prefix:'/v1/chili'
         }
+    })
+    .catch(err => {
+        console.log(err)
+    })
+    .catch(err => {
+        console.log(err)
+    })
+
+    await server
+    .register({
+        plugin:require("./routes/socket")
     })
     .catch(err => {
         console.log(err)
