@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")  //token 签发与验证
 const bcrypt = require("bcryptjs") // 字符串加密
 const Film = require("../models/Films") // 导入用户模型
+const Filmlist = require("../models/Filmlist") // 导入用户模型
 const Commit = require("../models/Commit") // 导入用户模型
 const mongoose = require("mongoose") // 操作mongoose 数据库
 const searchhandler = require('./../plugins/copydouban')
@@ -201,28 +202,55 @@ exports.plugin = {
                     request.headers.authorization,
                     process.env.SECRET_KEY
                 )
-                let reg = new RegExp(request.query.type);
+                // let reg = new RegExp(request.query.type);
                 // 如果有id 则请求单条 如果没有则请求全部影片
-                return Film.find({typelabel:{$regex: reg}}).sort({_id:-1}).limit(6)
-                .then(article => {
-                    if (article) {
-                        return {
-                            yinTou:['http://aladjs.cn/%E5%8A%A8%E6%BC%AB.jpg'],
-                            yinHeader:{
-                            title:"动漫天堂，唤醒儿时回忆！",
-                            subtit:"影视盘点top1",
-                            count:article.length,
-                            date:"05-31"
-                            },
-                            yincontent:article
-                        }
-                    } else {
-                        return {
-                            code:-1,
-                            msg:"找不到相关文章!"
-                        }
+                //  [{$lookup : {from: "films", localField: "yincontent", foreignField: "_id", as: "match_index"}}]
+
+                return Filmlist.aggregate([
+                    {
+                       $lookup:
+                          {
+                             from: "films",
+                             localField: 'yincontent',
+                             foreignField: "filmname",
+                             as: "yincontent"
+                         }
                     }
+                 ])
+                .then((res) => {
+                    return {
+                        code:0,
+                        data:res
+                    }
+                    console.log(res)
                 })
+                // return Filmlist.find({})
+                //         .then((filmlist) => {
+                //             console.log(filmlist[0].yincontent)
+                //             return {
+                //                 data:filmlist
+                //             }
+                //         })
+                // return Film.find({typelabel:{$regex: reg}}).sort({_id:-1}).limit(6)
+                // .then(article => {
+                //     if (article) {
+                //         return {
+                //             yinTou:['http://aladjs.cn/%E5%8A%A8%E6%BC%AB.jpg'],
+                //             yinHeader:{
+                //             title:"动漫天堂，唤醒儿时回忆！",
+                //             subtit:"影视盘点top1",
+                //             count:article.length,
+                //             date:"05-31"
+                //             },
+                //             yincontent:article
+                //         }
+                //     } else {
+                //         return {
+                //             code:-1,
+                //             msg:"找不到相关文章!"
+                //         }
+                //     }
+                // })
               }
         }
     ]),

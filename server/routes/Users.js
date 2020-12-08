@@ -25,6 +25,7 @@ exports.plugin = {
                         username:request.payload.username
                     })
                     .then(user => {
+                        console.log(user)
                         if(user) {
                             // 如果存在user 说明是用户
                             // 对比密码
@@ -71,6 +72,47 @@ exports.plugin = {
                                 code:-1,
                                 msg:'您还未注册，请注册后登录!'
                             }
+                        }
+                    })
+                    .catch(err => {
+                        return {
+                            error:err
+                        }
+                    })
+                }
+            },
+     
+           // 删除文章
+           {
+            method: 'GET',
+            path: '/delarticle',
+            handler: async (request, h) => {
+                
+            }
+        },
+            // 超级用户登录
+            {
+                method: 'post',
+                path: '/loginsuper',
+                handler: (request, h) => {
+                    console.log('有人调用超级用户登录')
+                    return User.findOne({
+                        username:request.payload.username
+                    })
+                    .then(user => {
+                        if(user) {
+                        // 如果存在user 说明是用户
+                        // 对比密码
+                        if(bcrypt.compareSync(request.payload.password,user.password)){
+                            return h.redirect('/index');
+                        }else{
+                            // 请求密码不同则提示不同
+                            return{
+                                code:-1,
+                                msg: '密码输入错误!'
+                            }
+                        }
+                           
                         }
                     })
                     .catch(err => {
@@ -288,21 +330,7 @@ exports.plugin = {
                 handler: async (request, h) => {
                   console.log('调用获取getarticles')
                   console.log()
-                    // const decoded = jwt.verify(
-                    //     request.headers.authorization,
-                    //     process.env.SECRET_KEY
-                    // )
-                    db.articles.aggregate([
-                        {
-                            $lookup:{
-                                fom: "user",
-                                localField:"user_id",
-                                foreignField:"_id",
-                                as:"inventory_doces"
-                            }
-                        }
-                    ])
-                    return inventory_doces.find({
+                    return Article.find({
                         _id: mongoose.Types.ObjectId(request.query.id),
                     })
                     .then(article => {

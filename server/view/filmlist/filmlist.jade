@@ -1,0 +1,107 @@
+doctype html
+html
+  head
+    style.
+        .filmbox{
+            display:flex;
+            flex-flow:row;
+            justify-content: space-between;
+        }
+  body
+    p 创建影单
+    div#container.filmbox
+        div(style="width:50%padding:0 15px")
+            p
+                input(type="text" placeholder="影单名字" name="listname")
+            p
+                input(type="text" placeholder="影单封面" name="banner")
+            p 
+                textarea(name="remark" placeholder="简介" cols="30" rows="4")
+            div#selectbox(style="min-height:200px;width:500px;background:#f1f1f1;overflow-x: scroll;")
+            button(style="margin:10px" onclick="saveList(this)") 添加
+            button(style="margin:10px") 取消
+        div(style="width:50%")
+            p 往影单里面添加影片:
+            div(style="overflow-y: scroll;border:1px solid rgb(195 186 186)")
+                ul(style="margin:0;padding:0")
+                    each film in filmlist
+                        li(style="list-style:none;height:25px;float:left;padding: 5px;")
+                            span= film.filmname
+                            button(onclick="addItem(this)" data-id= film._id) 添加
+    div
+        p 已存在影单
+        ul
+            li
+script.
+    //- 添加影片到影单中
+    function addItem(e){
+        e.innerHTML = '已添加';
+        e.setAttribute('disabled', true)
+        var ospan = document.createElement('span');
+        ospan.innerHTML = e.previousElementSibling.innerHTML;
+        ospan.id = e.getAttribute('data-id');
+        ospan.title = e.previousElementSibling.innerHTML;
+        ospan.style.padding = "10px";
+        ospan.style.display = "inline-block";
+        var oi = document.createElement('span');
+        oi.innerHTML = 'x';
+        oi.style.color = 'red';
+        oi.style.cursor = 'pointer';
+        ospan.appendChild(oi);
+        document.getElementById('selectbox').appendChild(ospan);        
+    }
+    //- 保存影单
+    function saveList(){
+        //- 获取影片
+        
+        var films = document.getElementById('selectbox').children;
+        var filmIdBox = []
+        for (var i=0; i< films.length ;i++) {
+            //- filmIdBox.push(films[i].getAttribute('id').replace(/['"]+/g, ''))
+            filmIdBox.push(films[i].getAttribute('title').replace(/['"]+/g, ''))
+        }
+        var params = {
+            filmname: document.querySelector('input[name="listname"]').value,
+            remark: document.querySelector('textarea[name="remark"]').value,
+            banner: document.querySelector('input[name="banner"]').value,
+            filmidbox: filmIdBox
+        }
+        console.log(params)
+        //- 保存影单
+        fetch( 'http://172.17.123.154:3000/v1/chili/savefilmlist', {
+        body: JSON.stringify(params),
+        headers:{
+            'Accept': 'text/javascript, application/javascript, application/ x-javascript, */*',
+            'Content-Type':'application/json',
+            'Authorization': window.localStorage.token
+        },
+            method: 'POST' // *GET, POST, PUT, DELETE, etc.
+        })
+        .then(function(res){
+            res.json().then(function(data){
+                if(data.code === 0) {
+                    console.log(data)
+                }
+            })
+        })
+    }
+    //- 获取影单
+    //- fetch( 'http://172.17.123.154:3000/v1/chili/savefilmlist', {
+    //-     body: JSON.stringify( {
+    //-     username: document.querySelector('input[name="username"]').value,
+    //-     password: document.querySelector('input[name="password"]').value
+    //-     }),
+    //-     headers:{
+    //-         'Accept': 'text/javascript, application/javascript, application/ x-javascript, */*',
+    //-         'Content-Type':'application/json',
+    //-         'Authorization': window.localStorage.token
+    //-     },
+    //-         method: 'POST' // *GET, POST, PUT, DELETE, etc.
+    //-     })
+    //-     .then(function(res){
+    //-         res.json().then(function(data){
+    //-             if(data.code === 0) {
+    //-                 console.log(data)
+    //-             }
+    //-         })
+    //-     })

@@ -3,9 +3,11 @@ const Inert = require("inert"); // 引入静态加载
 const Path = require("path"); // 引入路径
 const fs = require("fs"); // 引入读取
 const Vision = require('vision') // 引入接口
-const Ejs = require('ejs') // 引入模板
+const Jade = require('jade');
 const mongoose = require('mongoose')
 const redis = require("redis")
+const Article = require("./models/Article") // 导入用户模型
+const Film = require("./models/Films") // 导入用户模型
 // 创建接口服务器
 const server = new hapi.Server({
     host: '0.0.0.0',
@@ -22,16 +24,7 @@ const io = require("socket.io")(server.listener, {
     }
   });
 server.app.websocket = io
-// server.bind({websocket: io});
-// const routesCreate = require('./routes/createuser.route')
 require('./config/index.js')
-// var Schema = mongoose.Schema;
-// // 定义一个模式 用户
-// var UserModelSchema = new Schema({
-//     username: String,
-//     password: String
-// }, {collection: "user"});
-// var User = mongoose.model('User', UserModelSchema);
 // 创建应用
 // ----------------------------------------------- 分割线 --------------------------------------------------------------------
 
@@ -101,6 +94,16 @@ const init = async () => {
     .catch(err => {
         console.log(err)
     })
+
+    await server
+    .register({
+        plugin:require("./routes/Filmlist")
+    },{
+        routes:{
+            // 前缀
+            prefix:'/v1/chili'
+        }
+    })
     .catch(err => {
         console.log(err)
     })
@@ -115,30 +118,233 @@ const init = async () => {
     .catch(err => {
         console.log(err)
     })
-	// await client.register(Vision)  // 注册接口
+	await server.register(Vision)  // 注册接口
     await server.register(Inert)  // 注册静态
-	// client.views({
-	// 	engines: { ejs: Ejs },
-	// 	path: './view',
-	// 	// layout: true
-	// })
+	server.views({
+		engines: { jade: Jade },
+		path: './view',
+		// layout: true
+	})
     
     // 获取静态文件路由
-    // client.route({
-    //     path: "/index",
-    //     method: "GET",
-    //     handler: (request, h) => {
-    //         return h.view('index',
-    //         {
-    //             title: '这里是后台管理',
-    //             msg: '这边是后台管理部分'
-    //         },
-    //         {
-    //             //改变视图模板在目录路径
-    //             path:'./view/index'
-    //         })
-    //     }
-	// })
+    server.route({
+        path: "/index",
+        method: "GET",
+        handler: (request, h) => {
+            return h.view('index',
+            {
+                title: '这里是后台管理',
+                msg: '这边是后台管理部分'
+            },
+            {
+                //改变视图模板在目录路径
+                path:'./view/index'
+            })
+        }
+    })
+    server.route({
+        path: "/login",
+        method: "GET",
+        handler: (request, h) => {
+            return h.view('login',
+            {
+                title: '这里是后台管理',
+                msg: '这边是后台管理部分'
+            },
+            {
+                //改变视图模板在目录路径
+                path:'./view/login'
+            })
+        }
+    })
+    server.route({
+        path: "/filmlist",
+        method: "GET",
+        handler: (request, h) => {
+            return Film.find({})
+            .then(film => {
+                // console.log(film)
+                return h.view('filmlist',
+                    {
+                        filmlist: film
+                    },
+                    {
+                        //改变视图模板在目录路径
+                        path:'./view/filmlist'
+                    }) 
+            })
+        }
+    })
+    server.route({
+        path: "/article",
+        method: "GET",
+        handler: (request, h) => {
+            return Article.find({})
+               .then(article => {
+                //    console.log(article)
+                    if (article) {
+                        return h.view('article',
+                        {
+                            articles: article
+                        },
+                        {
+                            //改变视图模板在目录路径
+                            path:'./view/article'
+                        })
+                    } else {
+                        return {
+                            code:-1,
+                            msg:"找不到相关文章!"
+                        }
+                    }
+                })
+            
+        }
+    })
+    server.route({
+        path: "/delarticle",
+        method: "GET",
+        handler: (request, h) => {
+            console.log('删除文章')
+            // const decoded = jwt.verify(
+            //     request.headers.authorization,
+            //     process.env.SECRET_KEY
+            // )
+            return Article.deleteOne({_id: request.query.id})
+            
+            .then(article => {
+                console.log(article)
+                if (article) {
+                    return h.redirect('/article')
+                } else {
+                    return {
+                        code:-1,
+                        msg:"找不到相关文章!"
+                    }
+                }
+            })
+        }
+    })
+    server.route({
+        path: "/editarticle",
+        method: "GET",
+        handler: (request, h) => {
+            console.log('编辑文章')
+            // const decoded = jwt.verify(
+            //     request.headers.authorization,
+            //     process.env.SECRET_KEY
+            // )
+            return Article.findOne({
+                _id: mongoose.Types.ObjectId(request.query.id),
+            })
+            .then(article => {
+                console.log(article)
+                if (article) {
+                   return{
+                       code:0,
+                       data:article
+                   }
+                } else {
+                    return {
+                        code:-1,
+                        msg:"找不到相关文章!"
+                    }
+                }
+            })
+            // return Article.deleteOne({_id: request.query.id})
+            
+            // .then(article => {
+            //     console.log(article)
+            //     if (article) {
+            //         return h.redirect('/article')
+            //     } else {
+            //         return {
+            //             code:-1,
+            //             msg:"找不到相关文章!"
+            //         }
+            //     }
+            // })
+        }
+    })
+    server.route({
+        path: "/publicarticle",
+        method: "POST",
+        handler: (request, h) => {
+            console.log(request.payload)
+            console.log('发布文章')
+            console.log('调用保存文章')
+            if(request.payload.type === 'new') {
+                console.log(request.payload)
+                // 往schema中添加属性
+                const articlecontent = {
+                    title: request.payload.title,
+                    user_id: '5fc72c399ea7c948ccd98cb1',
+                    user_name: 'admin',
+                    isbanner: true,
+                    content:request.payload.content,
+                    bannerUrl: request.payload.bannerUrl,
+                    headUrl: ''
+                }
+                return Article.create(articlecontent)
+                    .then(result => {
+                        console.log('保存成功')
+                        // console.log(result)
+                        return {
+                            code:0
+                        }
+                    })
+                    .catch(err => {
+                        return h.response(error).code(500);
+                    })
+            }else {
+                // 往schema中添加属性
+            const articlecontent = {
+                title: request.payload.title,
+                user_id: '5fc72c399ea7c948ccd98cb1',
+                user_name: 'admin',
+                isbanner: true,
+                content:request.payload.content,
+                bannerUrl: request.payload.bannerUrl,
+                headUrl: ''
+            }
+            return Article.findByIdAndUpdate({
+                    _id: mongoose.Types.ObjectId(request.payload.id),
+                }, articlecontent)
+                .then(result => {
+                    console.log(result)
+                    return {
+                        code:0
+                    }
+                })
+                .catch(err => {
+                    return h.response(error).code(500);
+                })
+            }
+            // const decoded = jwt.verify(
+            //     request.headers.authorization,
+            //     process.env.SECRET_KEY
+            // )
+            
+            // console.log()
+            // const decoded = jwt.verify(
+            //     request.headers.authorization,
+            //     process.env.SECRET_KEY
+            // )
+            // return Article.deleteOne({_id: request.query.id})
+            
+            // .then(article => {
+            //     console.log(article)
+            //     if (article) {
+            //         return h.redirect('/article')
+            //     } else {
+            //         return {
+            //             code:-1,
+            //             msg:"找不到相关文章!"
+            //         }
+            //     }
+            // })
+        }
+	})
 	// client.route({
     //     path: "/{param*}",
     //     method: "GET",

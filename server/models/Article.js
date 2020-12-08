@@ -6,7 +6,9 @@ var ArticleModelSchema = new Schema({
     user_id:  {type:String},
     user_name: {type:String},
     isbanner: {type:Boolean},
-    headUrl: {type:String , default:''}
+    headUrl: {type:String , default:''},
+    bannerUrl: {type:String , default:''},
+    content: {type:String, default:''}
 }, {collection: "articles"});
 
 module.exports = Article = mongoose.model('Article', ArticleModelSchema);

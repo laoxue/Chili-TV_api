@@ -1,0 +1,106 @@
+doctype html
+html
+    head
+        link(href='https://cdn.bootcdn.net/ajax/libs/quill/2.0.0-dev.4/quill.snow.min.css', rel='stylesheet')
+        style.
+            .ql-editor{
+            min-height: 500px;
+            }
+    body
+    div(style="padding: 10px 0px;height:30px;width:100%")
+        input(type="text" name="title" placeholder="文章标题" style="height:100%;border:1px solid rgb(201 216 219)")
+    div(style="padding: 10px 0px;height:25px;width:100%")
+        label 封面图片: 
+        input(type="text" name="banner" placeholder="http://" style="border:1px solid rgb(201 216 219)")
+    div#div1
+    button#submit.submit(style="margin:10px" onclick="public(this)") 发布
+    button.cancel(style="margin:10px") 取消
+    div
+        p 已发布文章
+        ul(style="margin:0;padding:0")
+            each job in articles
+                li(style="list-style:none;padding:5px")= job.title
+                    button.delete(style="margin:0 5px" data-id=job._id onclick="delItem(this)") 删除
+                    button.edit(style="margin:0 5px" data-id=job._id onclick="editItem(this)") 编辑
+                    
+script(src="https://cdn.bootcdn.net/ajax/libs/quill/2.0.0-dev.4/quill.min.js")
+script.
+    var options = {
+        debug: 'info',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2,3, false] }],
+                ['bold', 'italic', 'underline','strike'],
+                [{'list': 'ordered'}, {'list': 'bullet'}],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
+                [{'indent': '-1'}, {'indent': '+1'}],
+                [{ 'direction': 'rtl' }],
+                // [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+                ['blockquote', 'code-block'],
+                ['link', 'image'],
+                ['clean']
+                ]
+        },
+        placeholder: '请输入文章内容...',
+        theme: 'snow'
+        };
+    var editor = new Quill('#div1', options);
+    //- const container = document.getElementById('div1');
+    //- const editor = new Quill(container);
+    //- const E = window.wangEditor
+    //- const editor = new E('#div1')
+    //- editor.create()
+    //- 删除文章
+    function delItem(e){
+        window.location.href = 'http://172.17.123.154:3000/delarticle?id='+ e.getAttribute('data-id').replace(/['"]+/g, '')
+    }
+    //- 发布文章
+    function public(e){
+        console.log()
+        fetch('http://172.17.123.154:3000/publicarticle', {
+        body: JSON.stringify( {
+            title: document.querySelector('input[name="title"]').value,
+            bannerUrl: document.querySelector('input[name="banner"]').value,
+            content: editor.container.firstChild.innerHTML,
+            type:e.getAttribute('editid') ? 'edit' : 'new',
+            id: e.getAttribute('editid') ? e.getAttribute('editid') : ''
+        }),
+        headers:{
+            'Accept': 'text/javascript, application/javascript, application/ x-javascript, */*',
+            'Content-Type':'application/json',
+            'Authorization': window.localStorage.token
+        },
+            method: 'POST' // *GET, POST, PUT, DELETE, etc.
+        })
+        .then(function(res){
+            res.json().then(function(data){
+                if(data.code === 0){
+                    location.reload()
+                }
+            })
+        })
+    }
+    function editItem(e){
+        fetch( 'http://172.17.123.154:3000/editarticle?id='+ e.getAttribute('data-id').replace(/['"]+/g, ''), {
+        headers:{
+            'Accept': 'text/javascript, application/javascript, application/ x-javascript, */*',
+            'Content-Type':'application/json',
+            'Authorization': window.localStorage.token
+        },
+            method: 'GET' // *GET, POST, PUT, DELETE, etc.
+        })
+        .then(function(res){
+            res.json().then(function(data){
+                console.log(data)
+                if(data.code === 0) {
+                    document.querySelector('input[name="title"]').value = data.data.title
+                    editor.container.firstChild.innerHTML = data.data.content
+                    document.querySelector('#submit').setAttribute('editid', data.data._id)
+                    document.querySelector('input[name="banner"]').value = data.data.bannerUrl
+                }
+            })
+        })
+    }
