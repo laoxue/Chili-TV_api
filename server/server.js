@@ -8,6 +8,7 @@ const mongoose = require('mongoose')
 const redis = require("redis")
 const Article = require("./models/Article") // 导入用户模型
 const Film = require("./models/Films") // 导入用户模型
+const Filmlist = require("./models/Filmlist") // 导入用户模型
 // 创建接口服务器
 const server = new hapi.Server({
     host: '0.0.0.0',
@@ -163,15 +164,29 @@ const init = async () => {
         handler: (request, h) => {
             return Film.find({})
             .then(film => {
-                // console.log(film)
-                return h.view('filmlist',
+                return Filmlist.aggregate([
                     {
-                        filmlist: film
+                       $lookup:
+                          {
+                             from: "films",
+                             localField: 'yincontent',
+                             foreignField: "filmname",
+                             as: "yincontent"
+                         }
+                    }
+                 ])
+                .then((res) => {
+                                    // console.log(film)
+                    return h.view('filmlist',
+                    {
+                        filmlist: film,
+                        hasfilem:res
                     },
                     {
                         //改变视图模板在目录路径
                         path:'./view/filmlist'
                     }) 
+                })
             })
         }
     })
