@@ -55,12 +55,12 @@ script.
     //- editor.create()
     //- 删除文章
     function delItem(e){
-        window.location.href = 'http://172.17.123.154:3000/delarticle?id='+ e.getAttribute('data-id').replace(/['"]+/g, '')
+        window.location.href = 'http://192.168.253.6:3000/delarticle?id='+ e.getAttribute('data-id').replace(/['"]+/g, '')
     }
     //- 发布文章
     function public(e){
         console.log()
-        fetch('http://172.17.123.154:3000/publicarticle', {
+        fetch('http://192.168.253.6:3000/publicarticle', {
         body: JSON.stringify( {
             title: document.querySelector('input[name="title"]').value,
             bannerUrl: document.querySelector('input[name="banner"]').value,
@@ -84,7 +84,7 @@ script.
         })
     }
     function editItem(e){
-        fetch( 'http://172.17.123.154:3000/editarticle?id='+ e.getAttribute('data-id').replace(/['"]+/g, ''), {
+        fetch( 'http://192.168.253.6:3000/editarticle?id='+ e.getAttribute('data-id').replace(/['"]+/g, ''), {
         headers:{
             'Accept': 'text/javascript, application/javascript, application/ x-javascript, */*',
             'Content-Type':'application/json',

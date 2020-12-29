@@ -3,7 +3,7 @@ const Inert = require("inert"); // 引入静态加载
 const Path = require("path"); // 引入路径
 const fs = require("fs"); // 引入读取
 const Vision = require('vision') // 引入接口
-const Jade = require('jade');
+// const Jade = require('jade');
 const mongoose = require('mongoose')
 const redis = require("redis")
 const Article = require("./models/Article") // 导入用户模型
@@ -148,21 +148,21 @@ const init = async () => {
 	})
     
     // 获取静态文件路由
-    // server.route({
-    //     path: "/index",
-    //     method: "GET",
-    //     handler: (request, h) => {
-    //         return h.view('index',
-    //         {
-    //             title: '这里是后台管理',
-    //             msg: '这边是后台管理部分'
-    //         },
-    //         {
-    //             //改变视图模板在目录路径
-    //             path:'./view/index'
-    //         })
-    //     }
-    // })
+    server.route({
+        path: "/index",
+        method: "GET",
+        handler: (request, h) => {
+            return h.view('index',
+            {
+                title: '这里是后台管理',
+                msg: '这边是后台管理部分'
+            },
+            {
+                //改变视图模板在目录路径
+                path:'./view'
+            })
+        }
+    })
     server.route({
         path: "/login",
         method: "GET",

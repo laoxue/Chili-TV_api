@@ -22,6 +22,7 @@
     "react-dom": "16.x.x"
   },
   "dependencies": {
+    "antd": "^4.9.4",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.3",
     "formidable": "^1.2.2",

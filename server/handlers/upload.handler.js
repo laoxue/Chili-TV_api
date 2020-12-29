@@ -7,7 +7,7 @@ const handleFileUpload = (file, name) => {
        if (err) {
         reject(err)
        }
-       resolve({ headUrl : `http://172.17.123.154:3000/v1/chili/${name}.jpg`})
+       resolve({ headUrl : `http://192.168.253.6:3000/v1/chili/${name}.jpg`})
     })
   })
 }
