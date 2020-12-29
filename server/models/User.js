@@ -9,4 +9,4 @@ var UserModelSchema = new Schema({
     headUrl: {type:String , default:''}
 }, {collection: "user"});
 
-module.exports = User = mongoose.model('User', UserModelSchema, 'user');
+module.exports = mongoose.model('User', UserModelSchema, 'user');

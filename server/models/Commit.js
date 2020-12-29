@@ -11,4 +11,4 @@ var CommitModelSchema = new Schema({
     user_id: {type:Schema.Types.ObjectId, ref:'User'},
 }, {collection: "commits"});
 
-module.exports = Commit = mongoose.model('Commit', CommitModelSchema);
+module.exports  = mongoose.model('Commit', CommitModelSchema);

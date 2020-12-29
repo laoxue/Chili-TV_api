@@ -9,6 +9,11 @@ const redis = require("redis")
 const Article = require("./models/Article") // 导入用户模型
 const Film = require("./models/Films") // 导入用户模型
 const Filmlist = require("./models/Filmlist") // 导入用户模型
+const HapiReactViews = require('hapi-react-views') // react引擎
+require('@babel/register')({
+    presets: ['@babel/preset-react', '@babel/preset-env']
+});
+require('babel-polyfill')
 // 创建接口服务器
 const server = new hapi.Server({
     host: '0.0.0.0',
@@ -51,6 +56,19 @@ mongoose.connection.on("error", (error) => {
 // ----------------------------------------------- 分割线 ---------------------------------------------------------------------
 // 定义服务启动函数
 const init = async () => {
+    // 日志
+    await server
+    .register({
+        plugin: require('hapi-pino'),
+        options: {
+            prettyPrint: true // 格式化输出
+        }
+    })
+    // 文档
+    await server.register({
+        plugin: require('lout')
+    })
+
     await server
     .register({
         plugin:require("./routes/Users")
@@ -122,27 +140,29 @@ const init = async () => {
 	await server.register(Vision)  // 注册接口
     await server.register(Inert)  // 注册静态
 	server.views({
-		engines: { jade: Jade },
-		path: './view',
-		// layout: true
+		engines: { 
+            jsx:HapiReactViews
+         },
+         relativeTo: __dirname,
+         path: 'view'
 	})
     
     // 获取静态文件路由
-    server.route({
-        path: "/index",
-        method: "GET",
-        handler: (request, h) => {
-            return h.view('index',
-            {
-                title: '这里是后台管理',
-                msg: '这边是后台管理部分'
-            },
-            {
-                //改变视图模板在目录路径
-                path:'./view/index'
-            })
-        }
-    })
+    // server.route({
+    //     path: "/index",
+    //     method: "GET",
+    //     handler: (request, h) => {
+    //         return h.view('index',
+    //         {
+    //             title: '这里是后台管理',
+    //             msg: '这边是后台管理部分'
+    //         },
+    //         {
+    //             //改变视图模板在目录路径
+    //             path:'./view/index'
+    //         })
+    //     }
+    // })
     server.route({
         path: "/login",
         method: "GET",
@@ -158,114 +178,114 @@ const init = async () => {
             })
         }
     })
-    server.route({
-        path: "/filmlist",
-        method: "GET",
-        handler: (request, h) => {
-            return Film.find({})
-            .then(film => {
-                return Filmlist.aggregate([
-                    {
-                       $lookup:
-                          {
-                             from: "films",
-                             localField: 'yincontent',
-                             foreignField: "filmname",
-                             as: "yincontent"
-                         }
-                    }
-                 ])
-                .then((res) => {
-                                    // console.log(film)
-                    return h.view('filmlist',
-                    {
-                        filmlist: film,
-                        hasfilem:res
-                    },
-                    {
-                        //改变视图模板在目录路径
-                        path:'./view/filmlist'
-                    }) 
-                })
-            })
-        }
-    })
-    server.route({
-        path: "/article",
-        method: "GET",
-        handler: (request, h) => {
-            return Article.find({})
-               .then(article => {
-                //    console.log(article)
-                    if (article) {
-                        return h.view('article',
-                        {
-                            articles: article
-                        },
-                        {
-                            //改变视图模板在目录路径
-                            path:'./view/article'
-                        })
-                    } else {
-                        return {
-                            code:-1,
-                            msg:"找不到相关文章!"
-                        }
-                    }
-                })
+    // server.route({
+    //     path: "/filmlist",
+    //     method: "GET",
+    //     handler: (request, h) => {
+    //         return Film.find({})
+    //         .then(film => {
+    //             return Filmlist.aggregate([
+    //                 {
+    //                    $lookup:
+    //                       {
+    //                          from: "films",
+    //                          localField: 'yincontent',
+    //                          foreignField: "filmname",
+    //                          as: "yincontent"
+    //                      }
+    //                 }
+    //              ])
+    //             .then((res) => {
+    //                                 // console.log(film)
+    //                 return h.view('filmlist',
+    //                 {
+    //                     filmlist: film,
+    //                     hasfilem:res
+    //                 },
+    //                 {
+    //                     //改变视图模板在目录路径
+    //                     path:'./view/filmlist'
+    //                 }) 
+    //             })
+    //         })
+    //     }
+    // })
+    // server.route({
+    //     path: "/article",
+    //     method: "GET",
+    //     handler: (request, h) => {
+    //         return Article.find({})
+    //            .then(article => {
+    //             //    console.log(article)
+    //                 if (article) {
+    //                     return h.view('article',
+    //                     {
+    //                         articles: article
+    //                     },
+    //                     {
+    //                         //改变视图模板在目录路径
+    //                         path:'./view/article'
+    //                     })
+    //                 } else {
+    //                     return {
+    //                         code:-1,
+    //                         msg:"找不到相关文章!"
+    //                     }
+    //                 }
+    //             })
             
-        }
-    })
-    server.route({
-        path: "/delarticle",
-        method: "GET",
-        handler: (request, h) => {
-            console.log('删除文章')
+    //     }
+    // })
+    // server.route({
+    //     path: "/delarticle",
+    //     method: "GET",
+    //     handler: (request, h) => {
+    //         console.log('删除文章')
+    //         // const decoded = jwt.verify(
+    //         //     request.headers.authorization,
+    //         //     process.env.SECRET_KEY
+    //         // )
+    //         return Article.deleteOne({_id: request.query.id})
+            
+    //         .then(article => {
+    //             console.log(article)
+    //             if (article) {
+    //                 return h.redirect('/article')
+    //             } else {
+    //                 return {
+    //                     code:-1,
+    //                     msg:"找不到相关文章!"
+    //                 }
+    //             }
+    //         })
+    //     }
+    // })
+    // server.route({
+    //     path: "/editarticle",
+    //     method: "GET",
+    //     handler: (request, h) => {
+    //         console.log('编辑文章')
             // const decoded = jwt.verify(
             //     request.headers.authorization,
             //     process.env.SECRET_KEY
             // )
-            return Article.deleteOne({_id: request.query.id})
-            
-            .then(article => {
-                console.log(article)
-                if (article) {
-                    return h.redirect('/article')
-                } else {
-                    return {
-                        code:-1,
-                        msg:"找不到相关文章!"
-                    }
-                }
-            })
-        }
-    })
-    server.route({
-        path: "/editarticle",
-        method: "GET",
-        handler: (request, h) => {
-            console.log('编辑文章')
-            // const decoded = jwt.verify(
-            //     request.headers.authorization,
-            //     process.env.SECRET_KEY
-            // )
-            return Article.findOne({
-                _id: mongoose.Types.ObjectId(request.query.id),
-            })
-            .then(article => {
-                console.log(article)
-                if (article) {
-                   return{
-                       code:0,
-                       data:article
-                   }
-                } else {
-                    return {
-                        code:-1,
-                        msg:"找不到相关文章!"
-                    }
-                }
-            })
+            // return Article.findOne({
+            //     _id: mongoose.Types.ObjectId(request.query.id),
+            // })
+            // .then(article => {
+            //     console.log(article)
+            //     if (article) {
+            //        return{
+            //            code:0,
+            //            data:article
+            //        }
+            //     } else {
+            //         return {
+            //             code:-1,
+            //             msg:"找不到相关文章!"
+            //         }
+            //     }
+            // })
             // return Article.deleteOne({_id: request.query.id})
             
             // .then(article => {
@@ -278,9 +298,9 @@ const init = async () => {
             //             msg:"找不到相关文章!"
             //         }
             //     }
-            // })
-        }
-    })
+    //         })
+    //     }
+    // })
     server.route({
         path: "/publicarticle",
         method: "POST",
