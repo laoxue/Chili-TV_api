@@ -1,10 +1,11 @@
-### - [移动客户端页面 Chili-TV_client](https://github.com/laoxue/Chili-TV_client) <= 这个客户端的API服务器
 
 <div align=center><img src="http://aladjs.cn/hapi.jpg" width="400"/></div>
 
 ![Build Status](https://img.shields.io/badge/build-passing-green.svg)
 ![Version 1.0.0](https://img.shields.io/badge/version-2.0.0-yellow.svg)
 [![License](https://img.shields.io/badge/license-GPL3.0-blue.svg)]()
+
+### - [移动客户端页面 Chili-TV_client](https://github.com/laoxue/Chili-TV_client) <= 这个客户端的API服务器
 
 这个项目是无聊的时候做的，主要客户端为移动端，利用唤醒URL schema原理, 可以将自己喜欢的资源通过百度云分享上传到平台 利用平台的共享性 或许自己的所需资源，相当于一个百度云盘的集合，整体项目分三部分 采用前后端分离处理。
 
