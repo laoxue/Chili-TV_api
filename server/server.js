@@ -68,7 +68,7 @@ const init = async () => {
     await server.register({
         plugin: require('lout')
     })
-
+    // 登录相关路由
     await server
     .register({
         plugin:require("./routes/Users")
@@ -84,7 +84,7 @@ const init = async () => {
     .catch(err => {
         console.log(err)
     })
-
+    // 电影相关路由
     await server
     .register({
         plugin:require("./routes/Films")
@@ -100,7 +100,23 @@ const init = async () => {
     .catch(err => {
         console.log(err)
     })
-
+    // 文章相关路由
+    // await server
+    // .register({
+    //     plugin:require("./routes/Articles")
+    // },{
+    //     routes:{
+    //         // 前缀
+    //         prefix:'/v1/chili'
+    //     }
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    // })
+    // 评论先关路由
     await server
     .register({
         plugin:require("./routes/Commit")
@@ -156,6 +172,21 @@ const init = async () => {
             {
                 title: '这里是后台管理',
                 msg: '这边是后台管理部分'
+            },
+            {
+                //改变视图模板在目录路径
+                path:'./view'
+            })
+        }
+    })
+    server.route({
+        path: "/",
+        method: "GET",
+        handler: (request, h) => {
+            return h.view('template',
+            {
+                title: '后台管理系统',
+                msg: '后台管理系统'
             },
             {
                 //改变视图模板在目录路径
@@ -234,165 +265,6 @@ const init = async () => {
     //                 }
     //             })
             
-    //     }
-    // })
-    // server.route({
-    //     path: "/delarticle",
-    //     method: "GET",
-    //     handler: (request, h) => {
-    //         console.log('删除文章')
-    //         // const decoded = jwt.verify(
-    //         //     request.headers.authorization,
-    //         //     process.env.SECRET_KEY
-    //         // )
-    //         return Article.deleteOne({_id: request.query.id})
-            
-    //         .then(article => {
-    //             console.log(article)
-    //             if (article) {
-    //                 return h.redirect('/article')
-    //             } else {
-    //                 return {
-    //                     code:-1,
-    //                     msg:"找不到相关文章!"
-    //                 }
-    //             }
-    //         })
-    //     }
-    // })
-    // server.route({
-    //     path: "/editarticle",
-    //     method: "GET",
-    //     handler: (request, h) => {
-    //         console.log('编辑文章')
-            // const decoded = jwt.verify(
-            //     request.headers.authorization,
-            //     process.env.SECRET_KEY
-            // )
-            // return Article.findOne({
-            //     _id: mongoose.Types.ObjectId(request.query.id),
-            // })
-            // .then(article => {
-            //     console.log(article)
-            //     if (article) {
-            //        return{
-            //            code:0,
-            //            data:article
-            //        }
-            //     } else {
-            //         return {
-            //             code:-1,
-            //             msg:"找不到相关文章!"
-            //         }
-            //     }
-            // })
-            // return Article.deleteOne({_id: request.query.id})
-            
-            // .then(article => {
-            //     console.log(article)
-            //     if (article) {
-            //         return h.redirect('/article')
-            //     } else {
-            //         return {
-            //             code:-1,
-            //             msg:"找不到相关文章!"
-            //         }
-            //     }
-    //         })
-    //     }
-    // })
-    server.route({
-        path: "/publicarticle",
-        method: "POST",
-        handler: (request, h) => {
-            console.log(request.payload)
-            console.log('发布文章')
-            console.log('调用保存文章')
-            if(request.payload.type === 'new') {
-                console.log(request.payload)
-                // 往schema中添加属性
-                const articlecontent = {
-                    title: request.payload.title,
-                    user_id: '5fc72c399ea7c948ccd98cb1',
-                    user_name: 'admin',
-                    isbanner: true,
-                    content:request.payload.content,
-                    bannerUrl: request.payload.bannerUrl,
-                    headUrl: ''
-                }
-                return Article.create(articlecontent)
-                    .then(result => {
-                        console.log('保存成功')
-                        // console.log(result)
-                        return {
-                            code:0
-                        }
-                    })
-                    .catch(err => {
-                        return h.response(error).code(500);
-                    })
-            }else {
-                // 往schema中添加属性
-            const articlecontent = {
-                title: request.payload.title,
-                user_id: '5fc72c399ea7c948ccd98cb1',
-                user_name: 'admin',
-                isbanner: true,
-                content:request.payload.content,
-                bannerUrl: request.payload.bannerUrl,
-                headUrl: ''
-            }
-            return Article.findByIdAndUpdate({
-                    _id: mongoose.Types.ObjectId(request.payload.id),
-                }, articlecontent)
-                .then(result => {
-                    console.log(result)
-                    return {
-                        code:0
-                    }
-                })
-                .catch(err => {
-                    return h.response(error).code(500);
-                })
-            }
-            // const decoded = jwt.verify(
-            //     request.headers.authorization,
-            //     process.env.SECRET_KEY
-            // )
-            
-            // console.log()
-            // const decoded = jwt.verify(
-            //     request.headers.authorization,
-            //     process.env.SECRET_KEY
-            // )
-            // return Article.deleteOne({_id: request.query.id})
-            
-            // .then(article => {
-            //     console.log(article)
-            //     if (article) {
-            //         return h.redirect('/article')
-            //     } else {
-            //         return {
-            //             code:-1,
-            //             msg:"找不到相关文章!"
-            //         }
-            //     }
-            // })
-        }
-	})
-	// client.route({
-    //     path: "/{param*}",
-    //     method: "GET",
-    //     handler: (request, h) => {
-    //         return h.view('index',
-    //         {
-    //             title: '这里是后台管理',
-    //             msg: '这边是后台管理部分'
-    //         },
-    //         {
-    //             //改变视图模板在目录路径
-    //             path:'./view/index'
-    //         })
     //     }
     // })
     await server.start(); // 启动服务器

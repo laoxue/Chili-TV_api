@@ -11,9 +11,9 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "7.x.x",
-    "@babel/core": "7.x.x",
+    "@babel/core": "^7.x.x",
     "@babel/preset-env": "7.x.x",
-    "@babel/preset-react": "7.x.x",
+    "@babel/preset-react": "^7.12.10",
     "@babel/register": "7.x.x",
     "babel-polyfill": "^6.26.0",
     "jsonwebtoken": "^8.5.1",
@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "antd": "^4.9.4",
+    "babel-core": "^6.23.1",
+    "babel-loader": "^6.2.4",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.0.0-rc.3",
     "formidable": "^1.2.2",
@@ -36,6 +38,7 @@
     "redis": "^3.0.2",
     "socket.io": "^3.0.3",
     "vision": "^5.4.4",
+    "webpack": "^1.14.0",
     "xlsx": "^0.16.8"
   }
 }

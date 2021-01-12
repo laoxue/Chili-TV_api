@@ -1,3 +1,29 @@
+登录逻辑备份
+fetch('http://192.168.253.6:3000/v1/chili/login', {
+        body: JSON.stringify( {
+        username: document.querySelector('input[name="username"]').value,
+        password: document.querySelector('input[name="password"]').value
+      }),
+      headers:{
+        'Accept': 'text/javascript, application/javascript, application/ x-javascript, */*',
+        'Content-Type':'application/json'
+      },
+        method: 'POST' // *GET, POST, PUT, DELETE, etc.
+      })
+      .then(response => {
+          response.json().then((data) =>{
+            console.log(data)
+            if(data.code === 0) {
+              localStorage.token = data.data.token
+              localStorage.username = data.data.username
+              localStorage.sex = data.data.sex
+              localStorage.remark = data.data.remark
+              localStorage.headerurl = data.data.headUrl
+              window.location.href = '/index'
+            }
+          })
+      })
+-----------------------------------------------------------------------
 doctype html
 html
     head

@@ -81,15 +81,6 @@ exports.plugin = {
                     })
                 }
             },
-     
-           // 删除文章
-           {
-            method: 'GET',
-            path: '/delarticle',
-            handler: async (request, h) => {
-                
-            }
-        },
             // 超级用户登录
             {
                 method: 'post',
@@ -122,6 +113,130 @@ exports.plugin = {
                     })
                 }
             },
+              // 发布文章
+        {
+            method: "post",
+            path: "/publicarticle",
+            handler: async (request, h) => {
+                console.log(request.payload)
+                console.log('发布文章')
+                console.log('调用保存文章')
+                if(request.payload.type === 'new') {
+                    console.log(request.payload)
+                    // 往schema中添加属性
+                    const articlecontent = {
+                        title: request.payload.title,
+                        user_id: '5fc72c399ea7c948ccd98cb1',
+                        user_name: 'admin',
+                        isbanner: true,
+                        content:request.payload.content,
+                        bannerUrl: request.payload.bannerUrl,
+                        headUrl: ''
+                    }
+                    return Article.create(articlecontent)
+                        .then(result => {
+                            console.log('保存成功')
+                            // console.log(result)
+                            return {
+                                code:0
+                            }
+                        })
+                        .catch(err => {
+                            return h.response(error).code(500);
+                        })
+                    } else {
+                         // 往schema中添加属性
+                        const articlecontent = {
+                            title: request.payload.title,
+                            user_id: '5fc72c399ea7c948ccd98cb1',
+                            user_name: 'admin',
+                            isbanner: true,
+                            content:request.payload.content,
+                            bannerUrl: request.payload.bannerUrl,
+                            headUrl: ''
+                        }
+                        return Article.findByIdAndUpdate({
+                                _id: mongoose.Types.ObjectId(request.payload.id),
+                            }, articlecontent)
+                            .then(result => {
+                                console.log(result)
+                                return {
+                                    code:0
+                                }
+                            })
+                            .catch(err => {
+                                return h.response(error).code(500);
+                })
+                    }
+                }
+            },
+            // 删除文章
+            {
+                    path: "/delarticle",
+                    method: "GET",
+                    handler: (request, h) => {
+                        console.log('删除文章')
+                        // const decoded = jwt.verify(
+                        //     request.headers.authorization,
+                        //     process.env.SECRET_KEY
+                        // )
+                        return Article.deleteOne({_id: request.query.id})
+                        
+                        .then(article => {
+                            console.log(article)
+                            if (article) {
+                                return h.redirect('/article')
+                            } else {
+                                return {
+                                    code:-1,
+                                    msg:"找不到相关文章!"
+                                }
+                            }
+                        })
+                    }
+            },
+            // 查询文章id
+            {
+                    path: "/editarticle",
+                    method: "GET",
+                    handler: (request, h) => {
+                        console.log('编辑文章')
+                        const decoded = jwt.verify(
+                            request.headers.authorization,
+                            process.env.SECRET_KEY
+                        )
+                        return Article.findOne({
+                            _id: mongoose.Types.ObjectId(request.query.id),
+                        })
+                        .then(article => {
+                            console.log(article)
+                            if (article) {
+                               return{
+                                   code:0,
+                                   data:article
+                               }
+                            } else {
+                                return {
+                                    code:-1,
+                                    msg:"找不到相关文章!"
+                                }
+                            }
+                        })
+                        return Article.deleteOne({_id: request.query.id})
+                        
+                        .then(article => {
+                            console.log(article)
+                            if (article) {
+                                return h.redirect('/article')
+                            } else {
+                                return {
+                                    code:-1,
+                                    msg:"找不到相关文章!"
+                                }
+                            }
+                        })
+                    }
+                },
             // 注册用户
             {
                 method: 'POST',
