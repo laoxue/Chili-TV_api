@@ -24,35 +24,35 @@ const server = new hapi.Server({
     },
     port: 3000
 })
-const io = require("socket.io")(server.listener, {
-    cors: {
-      origin: '*',
-    }
-  });
-server.app.websocket = io
-require('./config/index.js')
+// const io = require("socket.io")(server.listener, {
+//     cors: {
+//       origin: '*',
+//     }
+//   });
+// server.app.websocket = io
+// require('./config/index.js')
 // 创建应用
 // ----------------------------------------------- 分割线 --------------------------------------------------------------------
 
 // 链接本地数据库
-const mongoDBUrl = 'mongodb://127.0.0.1/chili-tv';
-server.app.db = mongoose.connect(mongoDBUrl,
-    { 
-        useNewUrlParser: true ,
-        useUnifiedTopology:true}
-)
-// redis链接
-const redisDBUrl = redis.createClient(6379, '127.0.0.1')
-server.app.dbRedis = redisDBUrl
+// const mongoDBUrl = 'mongodb://127.0.0.1/chili-tv';
+// server.app.db = mongoose.connect(mongoDBUrl,
+//     { 
+//         useNewUrlParser: true ,
+//         useUnifiedTopology:true}
+// )
+// // redis链接
+// const redisDBUrl = redis.createClient(6379, '127.0.0.1')
+// server.app.dbRedis = redisDBUrl
 
-mongoose.Promise = global.Promise;
-mongoose.connection.on("connected", () => {
-    console.log("mongodb数据库连接成功")
-    // console.log(mongoose)
-});
-mongoose.connection.on("error", (error) => {
-    console.log("mongodb数据库连接失败", error)
-});
+// mongoose.Promise = global.Promise;
+// mongoose.connection.on("connected", () => {
+//     console.log("mongodb数据库连接成功")
+//     // console.log(mongoose)
+// });
+// mongoose.connection.on("error", (error) => {
+//     console.log("mongodb数据库连接失败", error)
+// });
 // ----------------------------------------------- 分割线 ---------------------------------------------------------------------
 // 定义服务启动函数
 const init = async () => {
