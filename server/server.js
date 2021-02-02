@@ -24,12 +24,12 @@ const server = new hapi.Server({
     },
     port: 3000
 })
-const io = require("socket.io")(server.listener, {
-    cors: {
-      origin: '*',
-    }
-  });
-server.app.websocket = io
+// const io = require("socket.io")(server.listener, {
+//     cors: {
+//       origin: '*',
+//     }
+//   });
+// server.app.websocket = io
 require('./config/index.js')
 // 创建应用
 // ----------------------------------------------- 分割线 --------------------------------------------------------------------
@@ -144,15 +144,15 @@ const init = async () => {
     })
 
     await server
-    .register({
-        plugin:require("./routes/socket")
-    })
-    .catch(err => {
-        console.log(err)
-    })
-    .catch(err => {
-        console.log(err)
-    })
+    // .register({
+    //     plugin:require("./routes/socket")
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    // })
 	await server.register(Vision)  // 注册接口
     await server.register(Inert)  // 注册静态
 	server.views({
